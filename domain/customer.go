@@ -3,7 +3,7 @@ package domain
 import "golang_lessons/custom_errors"
 
 type Customer struct {
-	Id     int
+	Id     int `db:"customer_id"`
 	Name   string
 	City   string
 	Status int
