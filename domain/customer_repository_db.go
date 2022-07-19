@@ -52,7 +52,7 @@ func (r CustomerRepositoryDB) _getRows(sqlString string, filter *Filter) ([]Cust
 
 	if filter != nil {
 		sqlString += " WHERE status = ?"
-		err = r.db.Select(&customers, sqlString, filter.status)
+		err = r.db.Select(&customers, sqlString, filter.Status)
 	} else {
 		err = r.db.Select(&customers, sqlString)
 	}

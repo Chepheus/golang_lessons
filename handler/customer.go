@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"golang_lessons/custom_errors"
-	"golang_lessons/domain"
+	"golang_lessons/dto"
 	"golang_lessons/service"
 	"net/http"
 	"strconv"
@@ -46,11 +46,11 @@ func (h CustomerHandler) GetCustomer(w http.ResponseWriter, r *http.Request) {
 	h._encodeResponse(w, http.StatusOK, customer)
 }
 
-func (h CustomerHandler) _getFilter(r *http.Request) (*domain.Filter, *custom_errors.AppErrors) {
+func (h CustomerHandler) _getFilter(r *http.Request) (*dto.Filter, *custom_errors.AppErrors) {
 	status := r.URL.Query().Get("status")
 
 	if status != "" {
-		return domain.NewFilter(status)
+		return dto.NewFilterDTO(status)
 	}
 
 	return nil, nil
