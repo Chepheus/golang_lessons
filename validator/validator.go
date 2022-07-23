@@ -22,3 +22,16 @@ func ValidateAccount(request dto.NewAccountRequest) *custom_errors.AppErrors {
 
 	return nil
 }
+
+func ValidateTransaction(request dto.TransactionRequest) *custom_errors.AppErrors {
+	_, ok := allowedTypes[request.Type]
+	if !ok {
+		return custom_errors.NewValidationError("Incorrect type of transaction")
+	}
+
+	if request.Amount <= 0 {
+		return custom_errors.NewValidationError("Amount should be 1 or more")
+	}
+
+	return nil
+}
