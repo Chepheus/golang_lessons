@@ -1,19 +1,20 @@
-package domain
+package repository
 
 import (
 	"database/sql"
+	"golang_lessons/custom_errors"
+	"golang_lessons/domain"
+	"golang_lessons/logger"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"golang_lessons/custom_errors"
-	"golang_lessons/logger"
-	"time"
 )
 
 type CustomerRepositoryDB struct {
 	db *sqlx.DB
 }
 
-func (r CustomerRepositoryDB) FindAll(filter *Filter) ([]Customer, *custom_errors.AppErrors) {
+func (r CustomerRepositoryDB) FindAll(filter *domain.Filter) ([]domain.Customer, *custom_errors.AppErrors) {
 	sqlString := "SELECT customer_id, name, city, status FROM customers"
 
 	customers, err := r._getRows(sqlString, filter)
@@ -29,8 +30,8 @@ func (r CustomerRepositoryDB) FindAll(filter *Filter) ([]Customer, *custom_error
 	return customers, nil
 }
 
-func (r CustomerRepositoryDB) FindById(id int) (*Customer, *custom_errors.AppErrors) {
-	var c Customer
+func (r CustomerRepositoryDB) FindById(id int) (*domain.Customer, *custom_errors.AppErrors) {
+	var c domain.Customer
 
 	sqlString := "SELECT customer_id, name, city, status FROM customers WHERE customer_id = ?"
 	err := r.db.Get(&c, sqlString, id)
@@ -46,9 +47,9 @@ func (r CustomerRepositoryDB) FindById(id int) (*Customer, *custom_errors.AppErr
 	return &c, nil
 }
 
-func (r CustomerRepositoryDB) _getRows(sqlString string, filter *Filter) ([]Customer, error) {
+func (r CustomerRepositoryDB) _getRows(sqlString string, filter *domain.Filter) ([]domain.Customer, error) {
 	var err error
-	var customers []Customer
+	var customers []domain.Customer
 
 	if filter != nil {
 		sqlString += " WHERE status = ?"
@@ -60,15 +61,6 @@ func (r CustomerRepositoryDB) _getRows(sqlString string, filter *Filter) ([]Cust
 	return customers, err
 }
 
-func NewCustomerRepositoryDb() CustomerRepositoryDB {
-	db, err := sqlx.Open("mysql", "root:test@tcp(localhost:3306)/banking")
-	if err != nil {
-		panic(err)
-	}
-	// See "Important settings" section.
-	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
-
-	return CustomerRepositoryDB{db: db}
+func NewCustomerRepositoryDb(dbClient *sqlx.DB) CustomerRepositoryDB {
+	return CustomerRepositoryDB{db: dbClient}
 }
